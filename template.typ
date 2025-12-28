@@ -1,17 +1,15 @@
-#import "@preview/tablex:0.0.4": tablex, cellx, rowspanx
-
 #let default-currency = state("currency-state", "$")
 #let default-hundreds-separator = state("separator-state", ",")
 #let default-decimal = state("decimal-state", ".")
 
 #let date-to-str(date, format: "[day padding:none] [month repr:long] [year]") = {
-  if type(date) == "string" {
+  if type(date) == str {
     let pieces = date.split("-").map(int)
     date = datetime(year: pieces.at(0), month: pieces.at(1), day: pieces.at(2))
   }
   let to-format = if date == none { datetime.today() } else { date }
 
-  if type(to-format) == "datetime" {
+  if type(to-format) == datetime {
     to-format.display(format)
   } else {
     to-format
@@ -19,7 +17,7 @@
 }
 
 #let check-dict-keys(dict, ..keys) = {
-  assert(type(dict) == "dictionary", message: "dict must be a dictionary")
+  assert(type(dict) == dictionary, message: "dict must be a dictionary")
   for key in keys.pos() {
     assert(key in dict, message: "dict must contain key: " + repr(key))
   }
@@ -82,56 +80,51 @@
 #let price-formatter(number, currency: auto, separator: auto, decimal: auto, digits: 2) ={
   // Adds commas after each 3 digits to make
   // pricing more readable
-  if currency == auto {
-    currency = default-currency.display()
-  }
-  if separator == auto {
-    separator = default-hundreds-separator.display()
-  }
-  if decimal == auto {
-    decimal = default-decimal.display()
-  }
+  context {
+    let currency = if currency == auto { default-currency.get() } else { currency }
+    let separator = if separator == auto { default-hundreds-separator.get() } else { separator }
+    let decimal = if decimal == auto { default-decimal.get() } else { decimal }
 
-  let integer-portion = str(calc.abs(calc.trunc(number)))
-  let num-length = integer-portion.len()
-  let num-with-commas = ""
+    let integer-portion = str(calc.abs(calc.trunc(number)))
+    let num-length = integer-portion.len()
+    let num-with-commas = ""
 
-  for ii in range(num-length) {
-    if calc.rem(ii, 3) == 0 and ii > 0 {
-      num-with-commas = separator + num-with-commas
+    for ii in range(num-length) {
+      if calc.rem(ii, 3) == 0 and ii > 0 {
+        num-with-commas = separator + num-with-commas
+      }
+      num-with-commas = integer-portion.at(-ii - 1) + num-with-commas
     }
-    num-with-commas = integer-portion.at(-ii - 1) + num-with-commas
+    // Another "round" is needed to offset float imprecision
+    let fraction = calc.round(calc.fract(number), digits: digits + 1)
+    let fraction-int = calc.round(fraction * calc.pow(10, digits))
+    if fraction-int == 0 {
+      fraction-int = ""
+    } else {
+      fraction-int = decimal + str(fraction-int)
+    }
+    let formatted = currency + num-with-commas + fraction-int
+    if number < 0 {
+      formatted = "(" + formatted + ")"
+    }
+    formatted
   }
-  // Another "round" is needed to offset float imprecision
-  let fraction = calc.round(calc.fract(number), digits: digits + 1)
-  let fraction-int = calc.round(fraction * calc.pow(10, digits))
-  if fraction-int == 0 {
-    fraction-int = ""
-  } else {
-    fraction-int = decimal + str(fraction-int)
-  }
-  let formatted = currency + num-with-commas + fraction-int
-  if number < 0 {
-    formatted = "(" + formatted + ")"
-  }
-  formatted
 }
 
-#let c(body, ..args) = cellx(inset: 1.25em, ..args, text(weight: "bold", body))
+#let c(body, ..args) = table.cell(inset: 1.25em, ..args, text(weight: "bold", body))
 
 #let total-bill(amount) = {
   grid(columns: (auto, auto))[
   ][
-    #tablex(
+    #table(
       columns: (auto, auto),
       align: (auto, right),
-      auto-vlines: false,
+      stroke: none,
       c[TOTAL],
       c[#price-formatter(amount)],
     )
   ]
 }
-
 
 #let _format-charge-value(value, info, row-total, row-number) = {
   // TODO: Account for other helpful types like datetime
@@ -149,10 +142,13 @@
       multiplier = 1 + multiplier/100
     }
     if row-total == none {
-      row-total = 1
+      row-total = if typ == "currency" { value } else { 1 }
+    } else {
+      row-total *= multiplier
     }
-    row-total *= multiplier
-    did-multiply = true
+    if typ != "currency" or row-total != value {
+      did-multiply = true
+    }
   }
   let out-value = value
   if typ == "currency" {
@@ -166,6 +162,8 @@
   }
   if "suffix" in info {
     out-value = [#out-value#info.at("suffix")]
+  } else {
+    out-value = [#out-value]
   }
   (out-value, row-total, did-multiply)
 }
@@ -173,7 +171,7 @@
 #let _format-charge-columns(charge-info) = {
   let get-eval(dict, key, default) = {
     let value = dict.at(key, default: default)
-    if type(value) == "string" {
+    if type(value) == str {
       eval(value)
     }
     else {
@@ -189,7 +187,7 @@
     aligns.push(get-eval(info, "align", default-align))
     widths.push(get-eval(info, "width", auto))
   }
-  // Keys correspodn to tablex specs other than "names" which is positional
+  // Keys correspond to table specs other than "names" which is positional
   (names: names, align: aligns, columns: widths)
 }
 
@@ -235,7 +233,7 @@
       let (display-value, new-row-total, _) = _format-charge-value(
         value, info, row-total, row-number
       )
-      
+
       out.push(display-value)
       row-total = new-row-total
     }
@@ -252,9 +250,10 @@
   }
   let col-spec = _format-charge-columns(found-infos)
   let names = col-spec.remove("names")
-  let tbl = tablex(
-    ..col-spec,
-    auto-vlines: false,
+  let tbl = table(
+    columns: col-spec.columns,
+    align: col-spec.align,
+    stroke: none,
     inset: 1em,
     ..names,
     ..out,
