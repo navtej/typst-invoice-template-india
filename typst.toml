@@ -1,0 +1,7 @@
+[package]
+name = "invoice-template"
+version = "0.0.1"
+entrypoint = "template.typ"
+authors = ["Nathan Jessurun", "Ivan Mirić"]
+license = "Apache-2.0"
+description = "Simple invoice template."
