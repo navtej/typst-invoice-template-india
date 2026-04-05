@@ -4,7 +4,7 @@
 
 Generates a minimalist invoice from provided company, customer and charges data. One nice upside of this template vs manually configuring an invoice is that totals are automatically calculated, reducing the chance of human error.
 
-All required information can be changed in the sample [metadata.yaml](metadata.yaml) file, and the MWE [main.typ](main.typ) file shows its usage. If you prefer toml or json, these are fine too -- just be sure to change the reader function in your main file.
+All required information is shown in the sample [metadata.yaml](metadata.yaml) file. Copy it to `metadata.local.yaml`, edit that local file, and then render using the MWE [main.typ](main.typ). The template now always reads `metadata.local.yaml` and Typst will error if that file does not exist.
 
 ## Features
 ### Locale:
