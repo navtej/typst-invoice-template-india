@@ -24,6 +24,7 @@ To show a logo, set `doc-info.use-logo: true` and `doc-info.logo-file` in your m
 
 ## Batch Generation
 Use [`scripts/generate_invoices.py`](scripts/generate_invoices.py) to generate one PDF per CSV row.
+See [`scripts/example_invoices.csv`](scripts/example_invoices.csv) for a ready-to-run sample.
 
 Required CSV columns:
 - `date` in `YYYY-MM-DD` format
@@ -49,7 +50,7 @@ Optional CSV columns:
 Example:
 
 ```bash
-python3 scripts/generate_invoices.py invoices.csv out/
+python3 scripts/generate_invoices.py scripts/example_invoices.csv out/
 ```
 
 The script uses `metadata.local.yaml` as the base invoice configuration by default, so your existing branding, payment details, style, and preparer metadata are reused for every generated invoice.

@@ -1,0 +1,3 @@
+date,amount,description,invoice_id,title,output_name,client_name,client_address,client_email,client_phone,charge_date,quantity,tax
+2026-04-01,12500,Monthly design retainer,201,INVOICE,acme-april,Acme Industries,"Plot 21, Sector 18, Gurugram, Haryana 122015",accounts@acme.example,+91-9876543210,"April 1, 2026",1,18
+2026-04-15,2750.50,Consulting support,202,INVOICE,northwind-midmonth,Northwind Labs,"14 Residency Road, Bengaluru, Karnataka 560025",finance@northwind.example,+91-9988776655,"April 15, 2026",1,18
