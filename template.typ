@@ -139,7 +139,12 @@
 
 
   #grid(columns: 2, column-gutter: 1fr)[
-    #format-company-info(client-info, title: [*TO:*])
+    #format-company-info(
+      client-info,
+      title: [*TO:*],
+      heading-key: "name",
+      use-attn: false,
+    )
   ][
     #format-company-info(
       preparer-info,

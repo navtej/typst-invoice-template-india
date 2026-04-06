@@ -17,8 +17,7 @@ Simply change the default `locale` options in your metadata, or update the respe
 ### Custom styling
 Pass `use-default-style: false` to the invoice function to prevent the default font, paper size, and link styling.
 
-Replace `logo.svg` with your own logo to change the default, or comment it out in `template.typ` to remove it entirely.
-  - When typst allows checking for file existence, the logo will be removed automatically if it is not present.
+To show a logo, set `doc-info.use-logo: true` and `doc-info.logo-file` in your metadata. If either is missing, no logo is rendered.
 
 ## Roadmap
 Feedback from the community is welcome! No additional features are currently planned other than bugfixes.

@@ -6,6 +6,8 @@ doc-info:
     id: 001
   date: 2023-09-01
   title: INVOICE
+  use-logo: true
+  logo-file: logo.svg
 
 locale:
   currency: "$"
@@ -23,9 +25,8 @@ preparer-info:
     PAN: AAAAA0000A
 
 client-info:
-  company-name: Client, Inc.
+  name: Client, Inc.
   address: 123 Main St., City, State 12345
-  name: First Last
   email: name@client.com
   phone: 555-555-5555
 
