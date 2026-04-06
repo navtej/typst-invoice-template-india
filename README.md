@@ -22,5 +22,37 @@ Pass `use-default-style: false` to the invoice function to prevent the default f
 
 To show a logo, set `doc-info.use-logo: true` and `doc-info.logo-file` in your metadata. If either is missing, no logo is rendered.
 
+## Batch Generation
+Use [`scripts/generate_invoices.py`](scripts/generate_invoices.py) to generate one PDF per CSV row.
+
+Required CSV columns:
+- `date` in `YYYY-MM-DD` format
+- `amount`
+
+Optional CSV columns:
+- `description`
+- `invoice_id`
+- `title`
+- `output_name`
+- `client_name`
+- `client_address`
+- `client_email`
+- `client_phone`
+- `charge_date`
+- `quantity`
+- `qty`
+- `hours`
+- `rate`
+- `tax`
+- `discount`
+
+Example:
+
+```bash
+python3 scripts/generate_invoices.py invoices.csv out/
+```
+
+The script uses `metadata.local.yaml` as the base invoice configuration by default, so your existing branding, payment details, style, and preparer metadata are reused for every generated invoice.
+
 ## Roadmap
 Feedback from the community is welcome! No additional features are currently planned other than bugfixes.
