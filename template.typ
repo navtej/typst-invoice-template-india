@@ -1,6 +1,27 @@
+#let theme-defaults = (
+  accent-color: rgb("#0f4c5c"),
+  accent-soft-color: rgb("#e8f3f4"),
+  surface-color: rgb("#f8fafc"),
+  surface-strong-color: rgb("#eef4f8"),
+  border-color: rgb("#d7e1e8"),
+  muted-color: rgb("#5b6b79"),
+  title-color: rgb("#102a43"),
+  total-fill-color: rgb("#12344d"),
+  total-text-color: white,
+)
+
 #let default-currency = state("currency-state", "$")
 #let default-hundreds-separator = state("separator-state", ",")
 #let default-decimal = state("decimal-state", ".")
+#let default-accent-color = state("accent-color-state", theme-defaults.at("accent-color"))
+#let default-accent-soft-color = state("accent-soft-color-state", theme-defaults.at("accent-soft-color"))
+#let default-surface-color = state("surface-color-state", theme-defaults.at("surface-color"))
+#let default-surface-strong-color = state("surface-strong-color-state", theme-defaults.at("surface-strong-color"))
+#let default-border-color = state("border-color-state", theme-defaults.at("border-color"))
+#let default-muted-color = state("muted-color-state", theme-defaults.at("muted-color"))
+#let default-title-color = state("title-color-state", theme-defaults.at("title-color"))
+#let default-total-fill-color = state("total-fill-color-state", theme-defaults.at("total-fill-color"))
+#let default-total-text-color = state("total-text-color-state", theme-defaults.at("total-text-color"))
 
 #let normalize-date(date) = {
   if type(date) == str {
@@ -29,6 +50,16 @@
     assert(key in dict, message: "dict must contain key: " + repr(key))
   }
 }
+
+#let resolve-style-value(value) = {
+  if type(value) == str {
+    eval(value)
+  } else {
+    value
+  }
+}
+
+#let style-value(style, key, default) = resolve-style-value(style.at(key, default: default))
 
 #let format-doc-id(id-info, date) = {
   if type(id-info) != dictionary {
@@ -102,69 +133,142 @@
   heading-key: "company-name",
   use-attn: true,
   extra-details: none,
-) = [
-  #check-dict-keys(info, heading-key, "address", "name", "email", "phone")
-  #title\
-  #info.at(heading-key)\
-  #info.address
+) = {
+  check-dict-keys(info, heading-key, "address", "name", "email", "phone")
+  context block(
+    inset: 0.95em,
+    radius: 12pt,
+    fill: default-surface-color.get(),
+    stroke: (paint: default-border-color.get(), thickness: 0.8pt),
+  )[
+    #set text(size: 0.9em)
+    #text(weight: "bold", size: 0.76em, fill: default-accent-color.get())[#title]
+    #v(0.45em)
+    #text(weight: "semibold", size: 1.18em, fill: default-title-color.get())[#info.at(heading-key)]
+    #v(0.2em)
+    #set text(fill: default-muted-color.get())
+    #info.address
 
-  #if use-attn [Attn: #info.name#linebreak()]
-  #link("mailto:" + info.email)\
-  #info.phone
-  #extra-details
-]
-
-#let format-doc-info(info) = [
-  #check-dict-keys(info, "title", "id", "date")
-
-  #text(size: 2.75em, weight: "extrabold")[#info.title]
-  #v(-2em)
-  ID: #format-doc-id(info.id, info.date)\
-  Date: #date-to-str(info.date)
-  #if "valid-through" in info [
-    #linebreak()
-    Valid through #date-to-str(info.valid-through)
+    #v(0.55em)
+    #if use-attn [Attn: #info.name#linebreak()]
+    #link("mailto:" + info.email)\
+    #info.phone
+    #extra-details
   ]
-]
+}
 
-#let format-frontmatter(preparer-info, client-info, doc-info) = [
-  #grid(columns: 2, column-gutter: 1fr)[
+#let format-doc-info(info) = {
+  check-dict-keys(info, "title", "id", "date")
+
+  context block(
+    inset: 1.05em,
+    radius: 16pt,
+    fill: default-surface-strong-color.get(),
+    stroke: (paint: default-border-color.get(), thickness: 0.8pt),
+  )[
+    #text(weight: "bold", size: 0.76em, fill: default-accent-color.get())[INVOICE DETAILS]
+    #v(0.35em)
+    #text(size: 2.35em, weight: "extrabold", fill: default-title-color.get())[#info.title]
+    #v(0.4em)
+    #grid(
+      columns: (auto, 1fr),
+      column-gutter: 0.6em,
+      row-gutter: 0.35em,
+    )[
+      #text(weight: "bold", fill: default-title-color.get())[ID]
+    ][
+      #text(fill: default-muted-color.get())[#format-doc-id(info.id, info.date)]
+    ][
+      #text(weight: "bold", fill: default-title-color.get())[Date]
+    ][
+      #text(fill: default-muted-color.get())[#date-to-str(info.date)]
+    ]
+    #if "valid-through" in info [
+      #v(0.35em)
+      #grid(columns: (auto, 1fr), column-gutter: 0.6em)[
+        #text(weight: "bold", fill: default-title-color.get())[Valid Through]
+      ][
+        #text(fill: default-muted-color.get())[#date-to-str(info.valid-through)]
+      ]
+    ]
+  ]
+}
+
+#let format-frontmatter(preparer-info, client-info, doc-info) = context [
+  #grid(columns: (1.4fr, 0.8fr), column-gutter: 1.2em, row-gutter: 1em)[
     #format-doc-info(doc-info)
   ][
-    #set align(bottom)
-    #doc-info.at("logo", default: none)
+    #set align(top + right)
+    #if doc-info.at("logo", default: none) != none [
+      #block(
+        inset: 0.8em,
+        radius: 14pt,
+        fill: white,
+        stroke: (paint: default-border-color.get(), thickness: 0.8pt),
+      )[
+        #doc-info.at("logo")
+      ]
+    ]
   ]
-  #line(length: 100%)
+  #v(0.85em)
+  #line(length: 100%, stroke: (paint: default-border-color.get(), thickness: 1pt))
   #v(1em)
-
 
   #grid(columns: 2, column-gutter: 1fr)[
     #format-company-info(
       client-info,
-      title: [*TO:*],
+      title: [TO],
       heading-key: "name",
       use-attn: false,
     )
   ][
     #format-company-info(
       preparer-info,
-      title: [*FROM:*],
+      title: [FROM],
       heading-key: "name",
       use-attn: false,
       extra-details: format-tax-details(preparer-info.at("tax-details", default: none)),
     )
   ]
 
-  #v(1em)
+  #v(0.8em)
 ]
+
+#let format-account-details(account-details) = {
+  if type(account-details) == dictionary {
+    let cells = ()
+    for (key, value) in account-details.pairs() {
+      cells.push(text(weight: "bold", fill: default-title-color.get())[#key])
+      cells.push(text(fill: default-muted-color.get())[#value])
+    }
+    return [
+      #grid(
+        columns: (auto, 1fr),
+        column-gutter: 0.7em,
+        row-gutter: 0.35em,
+        ..cells,
+      )
+    ]
+  }
+
+  account-details
+}
 
 #let format-payment-info(payment-info) = {
   check-dict-keys(payment-info, "payment-window", "account-details")
-  [
-    #v(1em)
-    *Due within #payment-info.payment-window days of receipt.*
-
-    #payment-info.account-details
+  context block(
+    breakable: false,
+    inset: 0.95em,
+    radius: 12pt,
+    fill: default-surface-color.get(),
+    stroke: (paint: default-border-color.get(), thickness: 0.8pt),
+  )[
+    #text(weight: "bold", size: 0.76em, fill: default-accent-color.get())[PAYMENT DETAILS]
+    #v(0.4em)
+    #text(weight: "semibold", fill: default-title-color.get())[Due within #payment-info.payment-window of receipt.]
+    #v(0.55em)
+    #set text(fill: default-muted-color.get())
+    #format-account-details(payment-info.account-details)
   ]
 }
 
@@ -202,18 +306,32 @@
   }
 }
 
-#let c(body, ..args) = table.cell(inset: 1.25em, ..args, text(weight: "bold", body))
+#let c(body, ..args) = context table.cell(
+  inset: (x: 1.1em, y: 0.85em),
+  fill: default-accent-soft-color.get(),
+  ..args,
+  text(weight: "bold", fill: default-accent-color.get(), body),
+)
 
 #let total-bill(amount) = {
-  grid(columns: (auto, auto))[
+  context grid(columns: (auto, auto))[
   ][
-    #table(
-      columns: (auto, auto),
-      align: (auto, right),
-      stroke: none,
-      c[TOTAL],
-      c[#price-formatter(amount)],
-    )
+    #block(
+      inset: 0.25em,
+      radius: 14pt,
+      fill: default-total-fill-color.get(),
+    )[
+      #table(
+        columns: (auto, auto),
+        align: (auto, right),
+        stroke: none,
+        inset: (x: 1em, y: 0.65em),
+        table.hline(y: 0, stroke: (paint: white.transparentize(65%), thickness: 0.7pt)),
+        table.hline(y: 1, stroke: (paint: white.transparentize(65%), thickness: 0.7pt)),
+        table.cell(text(weight: "bold", fill: default-total-text-color.get(), [TOTAL])),
+        table.cell(text(weight: "bold", fill: default-total-text-color.get(), [#price-formatter(amount)])),
+      )
+    ]
   ]
 }
 
@@ -341,14 +459,22 @@
   }
   let col-spec = _format-charge-columns(found-infos)
   let names = col-spec.remove("names")
-  let tbl = table(
-    columns: col-spec.columns,
-    align: col-spec.align,
-    stroke: none,
-    inset: 1em,
-    ..names,
-    ..out,
-  )
+  let tbl = context block(
+    radius: 14pt,
+    stroke: (paint: default-border-color.get(), thickness: 0.8pt),
+    clip: true,
+  )[
+    #table(
+      columns: col-spec.columns,
+      align: col-spec.align,
+      stroke: none,
+      inset: (x: 1em, y: 0.7em),
+      table.hline(y: 0, stroke: (paint: default-border-color.get(), thickness: 0.8pt)),
+      table.hline(y: 1, stroke: (paint: default-border-color.get(), thickness: 0.8pt)),
+      ..names,
+      ..out,
+    )
+  ]
   (table: tbl, amount: total-amount)
 }
 
@@ -359,15 +485,53 @@
   client-info: none,
   payment-info: none,
   doc-info: none,
+  style: none,
   apply-default-style: true,
 ) = {
-  set text(font: "Arial", hyphenate: false) if apply-default-style
-  set page(paper: "us-letter", margin: 0.8in, number-align: top + right) if apply-default-style
+  let style = if style == none { (:) } else { style }
+  let font-face = style.at("font-face", default: "Arial")
+  let font-size = style.at("font-size", default: 11pt)
+  let font-color = style.at("font-color", default: black)
+  let hyphenate = style.at("hyphenate", default: false)
+  let link-color = style.at("link-color", default: blue.darken(20%))
+  let paper = style.at("paper", default: "us-letter")
+  let page-margin = style.at("page-margin", default: 0.8in)
+  let accent-color = style-value(style, "accent-color", theme-defaults.at("accent-color"))
+  let accent-soft-color = style-value(style, "accent-soft-color", theme-defaults.at("accent-soft-color"))
+  let surface-color = style-value(style, "surface-color", theme-defaults.at("surface-color"))
+  let surface-strong-color = style-value(style, "surface-strong-color", theme-defaults.at("surface-strong-color"))
+  let border-color = style-value(style, "border-color", theme-defaults.at("border-color"))
+  let muted-color = style-value(style, "muted-color", theme-defaults.at("muted-color"))
+  let title-color = style-value(style, "title-color", theme-defaults.at("title-color"))
+  let total-fill-color = style-value(style, "total-fill-color", theme-defaults.at("total-fill-color"))
+  let total-text-color = style-value(style, "total-text-color", theme-defaults.at("total-text-color"))
+
+  default-accent-color.update(accent-color)
+  default-accent-soft-color.update(accent-soft-color)
+  default-surface-color.update(surface-color)
+  default-surface-strong-color.update(surface-strong-color)
+  default-border-color.update(border-color)
+  default-muted-color.update(muted-color)
+  default-title-color.update(title-color)
+  default-total-fill-color.update(total-fill-color)
+  default-total-text-color.update(total-text-color)
+
+  set text(
+    font: font-face,
+    size: resolve-style-value(font-size),
+    fill: resolve-style-value(font-color),
+    hyphenate: hyphenate,
+  ) if apply-default-style
+  set page(
+    paper: paper,
+    margin: resolve-style-value(page-margin),
+    number-align: top + right,
+  ) if apply-default-style
 
   // conditional "set" rules are tricky due to scoping
   show link: content => {
     if apply-default-style {
-      set text(fill: blue.darken(20%))
+      set text(fill: resolve-style-value(link-color))
       underline(content)
     } else {
       content
@@ -401,15 +565,22 @@
 
   for (key, charge-list) in headings-and-charges.pairs() {
     if needs-heading {
-      [= #key]
+      context block(
+        inset: (x: 0.9em, y: 0.45em),
+        radius: 999pt,
+        fill: default-accent-soft-color.get(),
+      )[
+        #text(weight: "bold", fill: default-accent-color.get())[#key]
+      ]
+      v(0.55em)
     }
     let bill = bill-table(..charge-list, charge-info: charge-info)
     bill.table
     running-total += bill.amount
-
+    v(1em)
   }
 
-  h(1fr)
+  v(0.7em)
   set align(right) if not needs-heading
   total-bill(running-total)
 }

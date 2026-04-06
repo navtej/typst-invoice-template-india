@@ -10,6 +10,9 @@ All required information is shown in the sample [metadata.yaml](metadata.yaml) f
 ### Locale:
 Simply change the default `locale` options in your metadata, or update the respective template states before rendering.
 
+### Typography and page styling:
+Use the optional `style` section in your metadata to control `font-face`, `font-size`, `font-color`, `hyphenate`, `link-color`, `paper`, `page-margin`, and the invoice theme colors such as `accent-color`, `surface-color`, `border-color`, and `total-fill-color`.
+
 ### Billing options:
 - Any metadata key ending in "charges" (case insensitive) will be rendered as shown in the example.
 - If multiple "charges" are present, a heading is added to each table to distinguish them.

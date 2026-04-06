@@ -14,6 +14,24 @@ locale:
   separator: ","
   decimal: "."
 
+style:
+  font-face: Arial
+  font-size: 11pt
+  font-color: rgb("#111827")
+  hyphenate: false
+  link-color: rgb("#1d4ed8")
+  accent-color: rgb("#0f4c5c")
+  accent-soft-color: rgb("#e8f3f4")
+  surface-color: rgb("#f8fafc")
+  surface-strong-color: rgb("#eef4f8")
+  border-color: rgb("#d7e1e8")
+  muted-color: rgb("#5b6b79")
+  title-color: rgb("#102a43")
+  total-fill-color: rgb("#12344d")
+  total-text-color: white
+  paper: us-letter
+  page-margin: 0.8in
+
 preparer-info:
   name: Company, LLC
   address: 123 Main St., City, State 12345
@@ -32,13 +50,16 @@ client-info:
 
 payment-info:
   payment-window: 7 calendar days
-  account-details: |
+  account-details:
     Bank Name: HDFC Bank
     Account No.: 12345678901234
     IFSC Code: HDFC0001234
     SWIFT Code: HDFCINBB
 
 charge-info:
+  date:
+    type: string
+    width: 1.1fr
   price:
     type: currency
   quantity: &quantity
@@ -51,7 +72,7 @@ charge-info:
     type: number
   description:
     type: string
-    width: 1fr
+    width: 1.35fr
   tax:
     type: percent
     suffix: "%"
