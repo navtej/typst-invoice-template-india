@@ -1,5 +1,9 @@
 doc-info:
-  id: CXX-XXX
+  id:
+    prefix: INV
+    separator: /
+    format: [prefix, year, month-name, id]
+    id: 001
   date: 2023-09-01
   title: INVOICE
 
@@ -9,11 +13,14 @@ locale:
   decimal: "."
 
 preparer-info:
-  company-name: Company, LLC
+  name: Company, LLC
   address: 123 Main St., City, State 12345
-  name: First Last
   email: email@company.com
   phone: 555-555-5555
+  tax-details:
+    GST: 22AAAAA0000A1Z5
+    LUT: AD123456789012A
+    PAN: AAAAA0000A
 
 client-info:
   company-name: Client, Inc.
@@ -25,10 +32,10 @@ client-info:
 payment-info:
   payment-window: 7 calendar days
   account-details: |
-    Payable by ACH transfer to Account Name
-    Banking Institution
-    Account #: 1234567890
-    Routing #: 123456789
+    Bank Name: HDFC Bank
+    Account No.: 12345678901234
+    IFSC Code: HDFC0001234
+    SWIFT Code: HDFCINBB
 
 charge-info:
   price:

@@ -2,12 +2,19 @@
 #let default-hundreds-separator = state("separator-state", ",")
 #let default-decimal = state("decimal-state", ".")
 
-#let date-to-str(date, format: "[day padding:none] [month repr:long] [year]") = {
+#let normalize-date(date) = {
   if type(date) == str {
     let pieces = date.split("-").map(int)
-    date = datetime(year: pieces.at(0), month: pieces.at(1), day: pieces.at(2))
+    datetime(year: pieces.at(0), month: pieces.at(1), day: pieces.at(2))
+  } else if date == none {
+    datetime.today()
+  } else {
+    date
   }
-  let to-format = if date == none { datetime.today() } else { date }
+}
+
+#let date-to-str(date, format: "[day padding:none] [month repr:long] [year]") = {
+  let to-format = normalize-date(date)
 
   if type(to-format) == datetime {
     to-format.display(format)
@@ -23,15 +30,88 @@
   }
 }
 
-#let format-company-info(info, title: none) = [
-  #check-dict-keys(info, "company-name", "address", "name", "email", "phone")
+#let format-doc-id(id-info, date) = {
+  if type(id-info) != dictionary {
+    return [#id-info]
+  }
+
+  check-dict-keys(id-info, "prefix", "separator", "format", "id")
+  assert(id-info.prefix.len() >= 3, message: "doc-info.id.prefix must be at least 3 characters")
+  assert(id-info.separator.len() == 1, message: "doc-info.id.separator must be exactly 1 character")
+
+  let doc-date = normalize-date(date)
+  assert(type(doc-date) == datetime, message: "doc-info.date must be a date or YYYY-MM-DD string")
+
+  let parts = ()
+  for piece in id-info.format {
+    if piece == "prefix" {
+      parts.push(id-info.prefix)
+    } else if piece == "year" {
+      parts.push(doc-date.display("[year]"))
+    } else if piece == "month" {
+      parts.push(doc-date.display("[month padding:zero]"))
+    } else if piece == "month-name" {
+      parts.push(doc-date.display("[month repr:long]"))
+    } else if piece == "id" {
+      parts.push(str(id-info.id))
+    } else {
+      panic("Unsupported doc-info.id format token: " + repr(piece))
+    }
+  }
+
+  [
+    #for (index, part) in parts.enumerate() {
+      part
+      if index < parts.len() - 1 {
+        id-info.separator
+      }
+    }
+  ]
+}
+
+#let format-tax-details(tax-details) = {
+  if tax-details == none {
+    return []
+  }
+
+  let lines = ()
+  for key in ("GST", "LUT", "PAN") {
+    if key in tax-details {
+      lines.push([*#key:* #tax-details.at(key)])
+    }
+  }
+
+  if lines.len() == 0 {
+    []
+  } else {
+    [
+      #v(0.75em)
+      #for (index, line) in lines.enumerate() {
+        line
+        if index < lines.len() - 1 {
+          linebreak()
+        }
+      }
+    ]
+  }
+}
+
+#let format-company-info(
+  info,
+  title: none,
+  heading-key: "company-name",
+  use-attn: true,
+  extra-details: none,
+) = [
+  #check-dict-keys(info, heading-key, "address", "name", "email", "phone")
   #title\
-  #info.company-name\
+  #info.at(heading-key)\
   #info.address
 
-  Attn: #info.name\
+  #if use-attn [Attn: #info.name#linebreak()]
   #link("mailto:" + info.email)\
   #info.phone
+  #extra-details
 ]
 
 #let format-doc-info(info) = [
@@ -39,7 +119,7 @@
 
   #text(size: 2.75em, weight: "extrabold")[#info.title]
   #v(-2em)
-  ID: #info.id\
+  ID: #format-doc-id(info.id, info.date)\
   Date: #date-to-str(info.date)
   #if "valid-through" in info [
     #linebreak()
@@ -61,7 +141,13 @@
   #grid(columns: 2, column-gutter: 1fr)[
     #format-company-info(client-info, title: [*TO:*])
   ][
-    #format-company-info(preparer-info, title: [*FROM:*])
+    #format-company-info(
+      preparer-info,
+      title: [*FROM:*],
+      heading-key: "name",
+      use-attn: false,
+      extra-details: format-tax-details(preparer-info.at("tax-details", default: none)),
+    )
   ]
 
   #v(1em)
