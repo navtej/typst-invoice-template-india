@@ -27,25 +27,25 @@ Use [`scripts/generate_invoices.py`](scripts/generate_invoices.py) to generate o
 See [`scripts/example_invoices.csv`](scripts/example_invoices.csv) for a ready-to-run sample.
 
 Required CSV columns:
-- `date` in `YYYY-MM-DD` format
-- `amount`
+- `date`: Invoice date in `YYYY-MM-DD` format. This is also used to build the default line-item date when `charge_date` is omitted.
+- `amount`: Main invoice amount for that row. This becomes the line-item `price`.
 
 Optional CSV columns:
-- `description`
-- `invoice_id`
-- `title`
-- `output_name`
-- `client_name`
-- `client_address`
-- `client_email`
-- `client_phone`
-- `charge_date`
-- `quantity`
-- `qty`
-- `hours`
-- `rate`
-- `tax`
-- `discount`
+- `description`: Line-item description. Falls back to the script's default description if omitted.
+- `invoice_id`: Invoice sequence/id value. Overrides the generated invoice id for that row.
+- `title`: Replaces `doc-info.title` for that invoice, for example `INVOICE` or `TAX INVOICE`.
+- `output_name`: Output PDF filename for that row. `.pdf` is added automatically if missing.
+- `client_name`: Overrides `client-info.name`.
+- `client_address`: Overrides `client-info.address`.
+- `client_email`: Overrides `client-info.email`.
+- `client_phone`: Overrides `client-info.phone`.
+- `charge_date`: Custom date text shown in the line item. If omitted, the script formats the invoice `date` into a readable label.
+- `quantity`: Optional quantity field for the line item.
+- `qty`: Alias for `quantity`, matching the template's supported charge fields.
+- `hours`: Optional hours field for time-based billing rows.
+- `rate`: Optional rate field, useful together with `hours`.
+- `tax`: Optional tax percentage for the line item, for example `18`.
+- `discount`: Optional discount percentage for the line item.
 
 Example:
 
