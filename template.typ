@@ -106,9 +106,17 @@
   }
 
   let lines = ()
+  let seen-keys = ()
   for key in ("GST", "LUT", "PAN") {
     if key in tax-details {
       lines.push([*#key:* #tax-details.at(key)])
+      seen-keys.push(key)
+    }
+  }
+
+  for (key, value) in tax-details.pairs() {
+    if key not in seen-keys {
+      lines.push([*#key:* #value])
     }
   }
 
@@ -134,7 +142,7 @@
   use-attn: true,
   extra-details: none,
 ) = {
-  check-dict-keys(info, heading-key, "address", "name", "email", "phone")
+  check-dict-keys(info, heading-key, "address", "name", "email")
   context block(
     inset: 0.95em,
     radius: 12pt,
@@ -152,7 +160,7 @@
     #v(0.55em)
     #if use-attn [Attn: #info.name#linebreak()]
     #link("mailto:" + info.email)\
-    #info.phone
+    #if "phone" in info [#info.phone]
     #extra-details
   ]
 }
