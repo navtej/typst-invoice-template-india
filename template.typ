@@ -166,7 +166,6 @@
     fill: default-surface-strong-color.get(),
     stroke: (paint: default-border-color.get(), thickness: 0.8pt),
   )[
-    #text(weight: "bold", size: 0.76em, fill: default-accent-color.get())[INVOICE DETAILS]
     #v(0.35em)
     #text(size: 2.35em, weight: "extrabold", fill: default-title-color.get())[#info.title]
     #v(0.4em)

@@ -15,22 +15,40 @@ locale:
   decimal: "."
 
 style:
-  font-face: Arial
-  font-size: 11pt
-  font-color: rgb("#111827")
+  font-face: Inter
+  font-size: 10.5pt
+  font-color: rgb("#1f2937")
   hyphenate: false
-  link-color: rgb("#1d4ed8")
-  accent-color: rgb("#0f4c5c")
-  accent-soft-color: rgb("#e8f3f4")
-  surface-color: rgb("#f8fafc")
-  surface-strong-color: rgb("#eef4f8")
-  border-color: rgb("#d7e1e8")
-  muted-color: rgb("#5b6b79")
-  title-color: rgb("#102a43")
-  total-fill-color: rgb("#12344d")
+  link-color: rgb("#2563eb")
+  accent-color: rgb("#4f46e5")
+  accent-soft-color: rgb("#eef2ff")
+  surface-color: rgb("#fafafa")
+  surface-strong-color: rgb("#f3f4f6")
+  border-color: rgb("#e5e7eb")
+  muted-color: rgb("#6b7280")
+  title-color: rgb("#111827")
+  total-fill-color: rgb("#312e81")
   total-text-color: white
   paper: us-letter
   page-margin: 0.8in
+
+#style:
+#  font-face: Arial
+#  font-size: 11pt
+#  font-color: rgb("#111827")
+#  hyphenate: false
+#  link-color: rgb("#1d4ed8")
+#  accent-color: rgb("#0f4c5c")
+#  accent-soft-color: rgb("#e8f3f4")
+#  surface-color: rgb("#f8fafc")
+#  surface-strong-color: rgb("#eef4f8")
+#  border-color: rgb("#d7e1e8")
+#  muted-color: rgb("#5b6b79")
+#  title-color: rgb("#102a43")
+#  total-fill-color: rgb("#12344d")
+#  total-text-color: white
+#  paper: us-letter
+#  page-margin: 0.8in
 
 preparer-info:
   name: Company, LLC
